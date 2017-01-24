@@ -3,6 +3,10 @@ package com.example.zhenfangchen.rollingball;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 /**
  * Created by zhenfangchen on 1/22/17.
@@ -18,6 +22,8 @@ public class Ball {
 
     private Bitmap bitmap;
 
+    private int screenWidth, screenHeight;
+
     public Ball(Context context) {
         x = 50;
         y = 50;
@@ -26,11 +32,29 @@ public class Ball {
         ballSize = 50;
 
         bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ball), (int)ballSize, (int)ballSize, false);
+
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        manager.getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
     }
 
     public void update() {
         x += xSpeed;
         y += ySpeed;
+
+        if (x < 0) {
+            x = screenWidth - 1;
+        } else if (x > screenWidth) {
+            x = 1;
+        }
+
+        if (y < 0) {
+            y = screenHeight - 1;
+        } else if (y > screenHeight) {
+            y = 1;
+        }
 
         if (xSpeed > 0) {
             xSpeed -= 0.1;
@@ -45,6 +69,13 @@ public class Ball {
         }
 
         ballSize += ballSizeSpeed;
+
+        if (ballSize <= 0) {
+            ballSize = 1;
+        } else if (ballSize > 500) {
+            ballSize = 500;
+        }
+
         bitmap = Bitmap.createScaledBitmap(bitmap, (int)ballSize, (int)ballSize, false);
         if (ballSizeSpeed > 0) {
             ballSizeSpeed -= 2;
