@@ -1,6 +1,7 @@
 package com.example.zhenfangchen.rollingball;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -96,6 +97,7 @@ public class PlayingSurface extends SurfaceView implements Runnable, SensorEvent
     public void resume() {
 
         sensorManager.registerListener(this, gyro, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL);
 
         playing = true;
         gameThread = new Thread(this);
@@ -109,7 +111,8 @@ public class PlayingSurface extends SurfaceView implements Runnable, SensorEvent
 
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
+            float zAccel = event.values[2];
+            ball.update(zAccel);
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             if (timestamp != 0) {
                 final float dT = (event.timestamp - timestamp) * NS2S;

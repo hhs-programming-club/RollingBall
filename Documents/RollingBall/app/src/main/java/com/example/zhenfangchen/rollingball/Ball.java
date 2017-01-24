@@ -13,6 +13,9 @@ public class Ball {
     private double x, y;
     private double xSpeed, ySpeed;
 
+    private double ballSizeSpeed;
+    private double ballSize;
+
     private Bitmap bitmap;
 
     public Ball(Context context) {
@@ -20,8 +23,9 @@ public class Ball {
         y = 50;
         xSpeed = 0;
         ySpeed = 0;
+        ballSize = 50;
 
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ball);
+        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ball), (int)ballSize, (int)ballSize, false);
     }
 
     public void update() {
@@ -38,6 +42,23 @@ public class Ball {
             ySpeed -= 0.1;
         } else if (ySpeed < 0) {
             ySpeed += 0.1;
+        }
+
+        ballSize += ballSizeSpeed;
+        bitmap = Bitmap.createScaledBitmap(bitmap, (int)ballSize, (int)ballSize, false);
+        if (ballSizeSpeed > 0) {
+            ballSizeSpeed -= 2;
+        } else if (ballSizeSpeed < 0) {
+            ballSizeSpeed += 2;
+        }
+
+    }
+
+    public void update(double accel) {
+        if (accel > 0) {
+            ballSizeSpeed -= accel / 10;
+        } else if (accel < 0) {
+            ballSizeSpeed += accel / 10;
         }
     }
 
@@ -78,4 +99,6 @@ public class Ball {
     public Bitmap getBitmap() {
         return bitmap;
     }
+
+
 }
