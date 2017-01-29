@@ -11,8 +11,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.Arrays;
 
 /**
  * Created by zhenfangchen on 1/22/17.
@@ -109,10 +112,36 @@ public class PlayingSurface extends SurfaceView implements Runnable, SensorEvent
     private float timestamp;
     private static final double EPSILON = 0.1f;
 
+    private float[] lastAccel = new float[3];
+    private long lastUpdate;
+
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float zAccel = event.values[2];
-            ball.update(zAccel);
+            if (lastAccel[0] == 0 && lastAccel[1] == 0 && lastAccel[2] == 0) {
+                lastAccel[0] = event.values[0];
+                lastAccel[1] = event.values[1];
+                lastAccel[2] = event.values[2];
+
+                lastUpdate = System.currentTimeMillis();
+            } else {
+                float[] currentA = new float[3];
+                currentA[0] = event.values[0] - lastAccel[0];
+                currentA[1] = event.values[1] - lastAccel[1];
+                currentA[2] = event.values[2] - lastAccel[2];
+
+                lastAccel[0] = event.values[0];
+                lastAccel[1] = event.values[1];
+                lastAccel[2] = event.values[2];
+
+                long current = System.currentTimeMillis();
+                long timePassed = current - lastUpdate;
+                float zSpeed = currentA[2] / timePassed;
+
+                //Log.d("TEST", zSpeed + " ");
+
+                lastUpdate = current;
+                ball.update(zSpeed);
+            }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             if (timestamp != 0) {
                 final float dT = (event.timestamp - timestamp) * NS2S;

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -76,6 +77,8 @@ public class Ball {
             ballSize = 500;
         }
 
+        //Log.d("TEST", ballSize + " " + ballSizeSpeed);
+
         bitmap = Bitmap.createScaledBitmap(bitmap, (int)ballSize, (int)ballSize, false);
         if (ballSizeSpeed > 0) {
             ballSizeSpeed -= 2;
@@ -83,14 +86,24 @@ public class Ball {
             ballSizeSpeed += 2;
         }
 
+        if (ballSizeSpeed < 0.5 && ballSizeSpeed > -0.5) {
+            ballSizeSpeed = 0;
+        }
+
     }
 
     public void update(double accel) {
-        if (accel > 0) {
-            ballSizeSpeed -= accel / 10;
-        } else if (accel < 0) {
-            ballSizeSpeed += accel / 10;
+        if (accel < 0.0005) {
+            return;
         }
+
+        if (accel > 0) {
+            ballSizeSpeed -= accel / 10.0;
+        } else if (accel < 0) {
+            ballSizeSpeed += accel / 10.0;
+        }
+
+        Log.d("TEST", (accel / 10.0) + "");
     }
 
     public void update(double pitch, double azimuth) {
